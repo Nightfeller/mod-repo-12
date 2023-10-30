@@ -16,7 +16,7 @@ SELECT department.id, department_name FROM department;
 -- Update an employee's role
 
 UPDATE employee
-SET ${role_id} = ${role_id_replacement}, ${title} = ${title_replacement}, ${manager_id} = ${manager_id_replacement}
+SET ${role_id} = ${role_id_replacement}, ${manager_id} = ${manager_id_replacement}
 WHERE ${first_name} + ${last_name};
 
 -- Add an employee
