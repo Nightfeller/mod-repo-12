@@ -16,20 +16,22 @@ SELECT department.id, department_name FROM department;
 -- Update an employee's role
 
 UPDATE employee
-SET ${role_id} = ${role_id_replacement}, ${manager_id} = ${manager_id_replacement}
-WHERE ${first_name} + ${last_name};
+SET role_id = ?, manager_id = ?
+WHERE ? + ?;
 
 -- Add an employee
 
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
-VALUE (${new_first_name}, ${new_last_name}, ${chosen_role}, ${chosen_manager});
+VALUE (?, ?, ?, ?);
 
 -- Add a role
 
 INSERT INTO role (title, department_id, salary)
-VALUE (${new_title}, ${chosen_department_id}, ${new_salary});
+VALUE (?, ?, ?);
 
 -- Add a department
 
 INSERT INTO department (department_name)
-VALUE (${new_department_name});
+VALUE (?);
+
+-- Quit

@@ -1,2 +1,8 @@
-# mod-repo-12
-Repository for Module 12 challenge.
+# Employee Tracker
+
+## Description:
+
+This is a simple employee tracker to help keep track of your employees, their roles, and the role's departments.
+
+## Installation:
+
