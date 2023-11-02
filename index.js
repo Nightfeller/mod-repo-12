@@ -1,7 +1,6 @@
 const inquirer = require('inquirer');
 const mySQL = require('mysql2');
 
-
 const db = mySQL.createConnection(
     {
       host: 'localhost',
@@ -10,6 +9,61 @@ const db = mySQL.createConnection(
       database: 'workshop_db'
     }
   );
+
+let roleArray = [];
+let managerArray = ["None"];
+
+managerConfig(managerArray);
+
+function managerConfig(mA) {
+    db.promise().query(`SELECT id, first_name, last_name FROM employee;`).then(results => {
+        for (let l = 0; l < results[0].length; l++) {
+            mA.push(results[0][l].first_name + " " + results[0][l].last_name);
+        }
+        console.log(mA);
+    }).catch(err => console.log(err));
+}
+
+function roleConfig(rA) {
+    db.promise().query(`SELECT id, title FROM role;`).then(results => {
+        for (let i = 0; i < results[0].length; i++) {
+            rA.push(results[0][i].title);
+        }
+        // console.log(rA);
+        return rA;
+    }).catch(err => console.log(err));
+}
+
+function roleConfirmation(rI) {
+    db.promise().query(`SELECT id, title FROM role;`).then(results => {
+        for (let j = 0; j < results[0].length; j++) {
+            if (results[0][j].title == rI) {
+                return results[0][j].id;
+            } else {
+                console.log("ID not found.");
+                mainList();
+            }
+        }
+    }).catch(err => console.log(err));
+}
+
+function managerConfirmation(mI) {
+    db.promise().query(`SELECT id, first_name, last_name FROM employee;`).then(results => {
+        for (let k = 0; k < results[0].length; k++) {
+            if (results[0][k].first_name + " " + results[0][k].last_name == mI) {
+                return results[0][k].id;
+            } else if (mI == "None") {
+                return null;
+            } else {
+                console.log("ID not found.");
+                mainList();
+            }
+        }
+    }).catch(err => console.log(err));
+}
+
+roleConfig(roleArray);
+//console.log(roleArray);
 
 const menuItem = [
     {
@@ -44,15 +98,13 @@ const addEmployee = [
         type: 'list',
         message: "What is their role?",
         name: 'chosenRole',
-        choices: [
-
-        ]
+        choices: roleArray
     },
     {
         type: 'list',
         message: "Who will be their manager?",
         name: 'chosenManager',
-        choices: []
+        choices: managerArray
     }
 ]
 
@@ -107,19 +159,24 @@ const updateEmployee = [
 // I had to add this from function.js because the export didn't work for some reason.
 //
 
-function managerConfig(m) {
+
+
+// function roleConfig() {
+//     db.promise().query(`SELECT id, title FROM role;`).then(results => {
+//         let roleArr = [];
+//         for(let i = 0; i < results[0].length; i++) {
+//             roleArr.push(results[0][i].title);
+//         }
+//         // console.log(roleArr);
+//         return roleArr;
+//     });
+// }
+
+function departmentConfig() {
     
 }
 
-function roleConfig(r) {
-    db.promise().query();
-}
-
-function departmentConfig(d) {
-    
-}
-
-function mainList(mL, ma, ae, ar, ad, ue) {
+function mainList(mL, ae, ar, ad, ue) {
     inquirer.prompt(mL).then(res => {
         // Views all employees
         if (res.menu == "View all employees") {
@@ -149,10 +206,14 @@ function mainList(mL, ma, ae, ar, ad, ue) {
         // Adds an employee
         } else if (res.menu == "Add an employee") {
             inquirer.prompt(ae).then(resp => {
+                let roleID = roleConfirmation(resp.chosenRole);
+                let managerID = managerConfirmation(resp.chosenManager);
+                console.log(roleID);
+                console.log(managerID);
                 db.promise().query(
                     `INSERT INTO employee (first_name, last_name, role_id, manager_id)
                     VALUE (?, ?, ?, ?);`
-                , [resp.newFirstName, resp.newLastName, roleID, managerID]).then(results => {
+                , /* [resp.newFirstName, resp.newLastName, roleID, managerID] */).then(results => {
                     console.log(results);
                     mainList(menuItem, addEmployee, addRole, addDepartment, updateEmployee);
                 }).catch(err => console.log(err));
@@ -216,4 +277,5 @@ db.connect((error) => {
     }
 });
 
+// roleConfig();
 mainList(menuItem, addEmployee, addRole, addDepartment, updateEmployee);
