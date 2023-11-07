@@ -4,6 +4,10 @@ SELECT employee.id, first_name, last_name, title, department_name, salary FROM e
 JOIN role ON employee.role_id = role.id
 JOIN department ON role.department_id = department.id;
 
+-- Edge Case I
+
+SELECT employee.id, first_name, last_name FROM employee;
+
 -- View all roles
 
 SELECT role.id, title, department_name, salary FROM role
@@ -22,7 +26,7 @@ WHERE ? + ?;
 -- Add an employee
 
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
-VALUE (?, ?, ?, ?);
+VALUE (?);
 
 -- Add a role
 
@@ -35,3 +39,5 @@ INSERT INTO department (department_name)
 VALUE (?);
 
 -- Quit
+
+quit

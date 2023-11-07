@@ -20,7 +20,7 @@ function managerConfig(mA) {
         for (let l = 0; l < results[0].length; l++) {
             mA.push(results[0][l].first_name + " " + results[0][l].last_name);
         }
-        console.log(mA);
+        // console.log(mA);
     }).catch(err => console.log(err));
 }
 
@@ -34,27 +34,41 @@ function roleConfig(rA) {
     }).catch(err => console.log(err));
 }
 
-function roleConfirmation(rI) {
-    db.promise().query(`SELECT id, title FROM role;`).then(results => {
-        for (let j = 0; j < results[0].length; j++) {
-            if (results[0][j].title == rI) {
-                return results[0][j].id;
-            } else {
-                console.log("ID not found.");
-                mainList();
+function roleConfirmation(rI, idValue) {
+    console.log(idValue);
+    return db.promise().query(`SELECT id, title FROM role;`).then(results => {
+        for (let conf in results[0]) {
+            if (results[0][conf].title == rI) {
+                // console.log("-----=========-----");
+                // console.log(rI);
+                // console.log(results[0][conf].id);
+                idValue = results[0][conf].id;
+                // console.log(idValue);
+                // console.log('-----=========-----');
             }
         }
+        return idValue;
     }).catch(err => console.log(err));
 }
 
-function managerConfirmation(mI) {
-    db.promise().query(`SELECT id, first_name, last_name FROM employee;`).then(results => {
+function managerConfirmation(mI, idValue) {
+    console.log(idValue);
+    return db.promise().query(`SELECT id, first_name, last_name FROM employee;`).then(results => {
         for (let k = 0; k < results[0].length; k++) {
             if (results[0][k].first_name + " " + results[0][k].last_name == mI) {
-                return results[0][k].id;
+                idValue = results[0][k].id;
+                console.log(idValue);
+                return idValue;
             } else if (mI == "None") {
-                return null;
+                // console.log(mI);
+                // console.log(null);
+                idValue = null;
+                console.log(idValue);
+                return idValue;
             } else {
+                console.log(`----------------------------------------`)
+                console.log(mI);
+                console.log(true);
                 console.log("ID not found.");
                 mainList();
             }
@@ -205,18 +219,28 @@ function mainList(mL, ae, ar, ad, ue) {
             }).catch(err => console.log(err));
         // Adds an employee
         } else if (res.menu == "Add an employee") {
-            inquirer.prompt(ae).then(resp => {
-                let roleID = roleConfirmation(resp.chosenRole);
-                let managerID = managerConfirmation(resp.chosenManager);
-                console.log(roleID);
-                console.log(managerID);
-                db.promise().query(
-                    `INSERT INTO employee (first_name, last_name, role_id, manager_id)
-                    VALUE (?, ?, ?, ?);`
-                , /* [resp.newFirstName, resp.newLastName, roleID, managerID] */).then(results => {
-                    console.log(results);
-                    mainList(menuItem, addEmployee, addRole, addDepartment, updateEmployee);
-                }).catch(err => console.log(err));
+            inquirer.prompt(ae).then(async resp => {
+                let roleID;
+                let managerID;
+                roleID = await roleConfirmation(resp.chosenRole, roleID);
+                // managerID = managerConfirmation(resp.chosenManager, managerID);
+
+                console.log([resp.newFirstName, resp.newLastName, roleID, managerID]);
+                if (roleID && managerID){
+                    db.promise().query(
+                        `INSERT INTO employee (first_name, last_name, role_id, manager_id)
+                        VALUE (?, ?, ?, ?);`
+                    , /* [resp.newFirstName, resp.newLastName, roleID, managerID] */).then(results => {
+                        console.log([resp.newFirstName, resp.newLastName, roleID, managerID]);
+                        console.log(results);
+                        mainList(menuItem, addEmployee, addRole, addDepartment, updateEmployee);
+                    }).catch(err => console.log(err));
+                } else if (roleID == undefined || managerID == undefined) {
+                    console.log("roleID/managerID do not have ID values.");
+                    return;
+                } else {
+                    return;
+                }
             }).catch(erro => console.log(erro));
         // Adds a role
         } else if (res.menu == "Add a role") {
