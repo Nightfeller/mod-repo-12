@@ -15,6 +15,11 @@ let managerArray = ["None"];
 let departmentArray = [];
 let employeeArray = [];
 
+roleConfig(roleArray);
+managerConfig(managerArray);
+employeeConfig(employeeArray);
+departmentConfig(departmentArray);
+
 // This and employeeConfig() are functionally the same.
 function managerConfig(mA) {
     db.promise().query(`SELECT id, first_name, last_name FROM employee;`).then(results => {
@@ -51,7 +56,7 @@ function employeeConfig(eA) {
         for (let k = 0; k < results[0].length; k++) {
             eA.push(results[0][k].first_name + " " + results[0][k].last_name);
         }
-        console.log(eA);
+        // console.log(eA);
         return eA;
     }).catch(err => console.log(err));
 }
@@ -196,13 +201,13 @@ const updateEmployee = [
         type: 'list',
         message: "What will their new role be?",
         name: 'updatedRole',
-        choices: roleConfig
+        choices: roleArray
     },
     {
-        type: 'confirm',
-        message: "Will the manager be changed?",
+        type: 'list',
+        message: "Who will be the new manager?",
         name: 'updatedManager',
-        choices: managerConfig
+        choices: managerArray
     }
 ]
 
@@ -263,13 +268,17 @@ function mainList(mL, ae, ar, ad, ue) {
             }).catch(err => console.log(err));
         // Adds an employee
         } else if (res.menu == "Add an employee") {
+                roleArray = [];
+                managerArray = ["None"];
+                roleConfig(roleArray);
+                managerConfig(managerArray);
             inquirer.prompt(ae).then(async resp => {
+                
                 let roleID;
                 let managerID;
-                let employeeName = [];
                 roleID = await roleConfirmation(resp.chosenRole, roleID);
                 managerID = await managerConfirmation(resp.chosenManager, managerID);
-                employeeName = await employeeConfirmation();
+                
                 
                 // console.log([resp.newFirstName, resp.newLastName, roleID, managerID]);
                 await db.promise().query(
@@ -284,6 +293,9 @@ function mainList(mL, ae, ar, ad, ue) {
             }).catch(erro => console.log(erro));
         // Adds a role
         } else if (res.menu == "Add a role") {
+            departmentArray = [];
+
+            departmentConfig(departmentArray);
             inquirer.prompt(ar).then(async resp => {
                 let departmentID;
                 departmentID = await departmentConfirmation(resp.chosenDepartment);
@@ -310,12 +322,22 @@ function mainList(mL, ae, ar, ad, ue) {
             }).catch(erro => console.log(erro));
         // Updates a current employee's role
         } else if (res.menu == "Update an employee's role") {
+            roleArray = [];
+            managerArray = ["None"];
+            employeeArray = [];
+
+            roleConfig(roleArray);
+            managerConfig(managerArray);
+            employeeConfig(employeeArray);
             inquirer.prompt(ue).then(async resp => {
                 let roleID;
                 let managerID;
+                let employeeName = [];
                 roleID = await roleConfirmation(resp.updatedRole, roleID);
                 managerID = await managerConfirmation(resp.updatedManager, managerID);
+                employeeName = await employeeConfirmation();
 
+                console.log([roleID, managerID, employeeName[0], employeeName[1]]);
                 await db.promise().query(
                     `UPDATE employee SET role_id = ?, manager_id = ? WHERE ? + ?;`
                 , /* [roleID, managerID, resp.updatedFirstName, resp.updatedLastName] */).then(results => {
