@@ -23,8 +23,8 @@ departmentConfig(departmentArray);
 // This and employeeConfig() are functionally the same.
 function managerConfig(mA) {
     db.promise().query(`SELECT id, first_name, last_name FROM employee;`).then(results => {
-        for (let l = 0; l < results[0].length; l++) {
-            mA.push(results[0][l].first_name + " " + results[0][l].last_name);
+        for (let mc = 0; mc < results[0].length; mc++) {
+            mA.push(results[0][mc].first_name + " " + results[0][mc].last_name);
         }
         // console.log(mA);
     }).catch(err => console.log(err));
@@ -32,8 +32,8 @@ function managerConfig(mA) {
 
 function roleConfig(rA) {
     db.promise().query(`SELECT id, title FROM role;`).then(results => {
-        for (let i = 0; i < results[0].length; i++) {
-            rA.push(results[0][i].title);
+        for (let rc = 0; rc < results[0].length; rc++) {
+            rA.push(results[0][rc].title);
         }
         // console.log(rA);
         return rA;
@@ -42,8 +42,8 @@ function roleConfig(rA) {
 
 function departmentConfig(dA) {
     db.promise().query(`SELECT id, department_name FROM department;`).then(results => {
-        for (let j = 0; j < results[0].length; j++) {
-            dA.push(results[0][j].department_name);
+        for (let dc = 0; dc < results[0].length; dc++) {
+            dA.push(results[0][dc].department_name);
         }
         // console.log(dA);
         return dA;
@@ -53,26 +53,44 @@ function departmentConfig(dA) {
 // This and managerConfig() are functionally the same.
 function employeeConfig(eA) {
     db.promise().query(`SELECT id, first_name, last_name FROM employee;`).then(results => {
-        for (let k = 0; k < results[0].length; k++) {
-            eA.push(results[0][k].first_name + " " + results[0][k].last_name);
+        for (let ec = 0; ec < results[0].length; ec++) {
+            eA.push(results[0][ec].first_name + " " + results[0][ec].last_name);
         }
         // console.log(eA);
         return eA;
     }).catch(err => console.log(err));
 }
 
+function employeeConfirmation(eI, idValue) {
+    console.log(idValue);
+    return db.promise().query(`SELECT id, first_name, last_name FROM employee;`).then(results => {
+        for (let eConf in results[0]) {
+            if (results[0][eConf].first_name + " " + results[0][eConf].last_name == eI) {
+                idValue = results[0][eConf].id;
+                // console.log("-----=========-----");
+                // console.log(idValue);
+                // console.log(eI);
+                // console.log(results[0][conf].id);
+                // console.log(results[0][conf].first_name + " " + results[0][conf].last_name);
+                // console.log("-----=========-----");
+            }
+        }
+        return idValue;
+    }).catch(err => console.log(err));
+}
+
 function departmentConfirmation(dI, idValue) {
     console.log(idValue);
     return db.promise().query(`SELECT id, department_name FROM department;`).then(results => {
-        for (let conf in results[0]) {
-            if (results[0][conf].department_name == dI) {
-                idValue = results[0][conf].id;
-                console.log("-----=========-----");
-                console.log(dI);
-                console.log(results[0][conf].department_name);
-                console.log(idValue);
-                console.log(results[0][conf].id);
-                console.log("-----=========-----");
+        for (let dConf in results[0]) {
+            if (results[0][dConf].department_name == dI) {
+                idValue = results[0][dConf].id;
+                // console.log("-----=========-----");
+                // console.log(dI);
+                // console.log(results[0][conf].department_name);
+                // console.log(idValue);
+                // console.log(results[0][conf].id);
+                // console.log("-----=========-----");
             }
         }
         return idValue;
@@ -82,12 +100,12 @@ function departmentConfirmation(dI, idValue) {
 function roleConfirmation(rI, idValue) {
     console.log(idValue);
     return db.promise().query(`SELECT id, title FROM role;`).then(results => {
-        for (let conf in results[0]) {
-            if (results[0][conf].title == rI) {
+        for (let rConf in results[0]) {
+            if (results[0][rConf].title == rI) {
+                idValue = results[0][rConf].id;
                 // console.log("-----=========-----");
                 // console.log(rI);
                 // console.log(results[0][conf].id);
-                idValue = results[0][conf].id;
                 // console.log(idValue);
                 // console.log('-----=========-----');
             }
@@ -99,9 +117,9 @@ function roleConfirmation(rI, idValue) {
 function managerConfirmation(mI, idValue) {
     console.log(idValue);
     return db.promise().query(`SELECT id, first_name, last_name FROM employee;`).then(results => {
-        for (let conf in results[0]) {
-            if (results[0][conf].first_name + " " + results[0][conf].last_name == mI) {
-                idValue = results[0][conf].id;
+        for (let mConf in results[0]) {
+            if (results[0][mConf].first_name + " " + results[0][mConf].last_name == mI) {
+                idValue = results[0][mConf].id;
                 // console.log("-----=========-----");
                 // console.log(idValue);
                 // console.log(mI);
@@ -117,7 +135,10 @@ function managerConfirmation(mI, idValue) {
     }).catch(err => console.log(err));
 }
 
-
+function respondWithTable(results) {
+        const transformed = results.reduce((acc, {id, ...x}) => { acc[id] = x; return acc}, {});
+        console.table(transformed);
+}
 //console.log(roleArray);
 
 const menuItem = [
@@ -248,7 +269,7 @@ function mainList(mL, ae, ar, ad, ue) {
                 JOIN role ON employee.role_id = role.id
                 JOIN department ON role.department_id = department.id;`
             ).then(results => {
-                console.log(results);
+                respondWithTable(results[0]);
                 mainList(menuItem, addEmployee, addRole, addDepartment, updateEmployee);
             }).catch(err => console.log(err));
         // Views all roles
@@ -257,13 +278,13 @@ function mainList(mL, ae, ar, ad, ue) {
                 `SELECT role.id, title, department_name, salary FROM role
                 JOIN department ON role.department_id = department.id;`
             ).then(results => {
-                console.log(results);
+                respondWithTable(results[0]);
                 mainList(menuItem, addEmployee, addRole, addDepartment, updateEmployee);
             }).catch(err => console.log(err));
         // Views all departments
         } else if (res.menu == "View all departments") {
             db.promise().query(`SELECT department.id, department_name FROM department;`).then(results => {
-                console.log(results);
+                respondWithTable(results[0]);
                 mainList(menuItem, addEmployee, addRole, addDepartment, updateEmployee);
             }).catch(err => console.log(err));
         // Adds an employee
@@ -332,15 +353,15 @@ function mainList(mL, ae, ar, ad, ue) {
             inquirer.prompt(ue).then(async resp => {
                 let roleID;
                 let managerID;
-                let employeeName = [];
+                let employeeID;
                 roleID = await roleConfirmation(resp.updatedRole, roleID);
                 managerID = await managerConfirmation(resp.updatedManager, managerID);
-                employeeName = await employeeConfirmation();
+                employeeID = await employeeConfirmation(resp.updatedEmployee, employeeID);
 
-                console.log([roleID, managerID, employeeName[0], employeeName[1]]);
+                console.log([roleID, managerID, employeeID]);
                 await db.promise().query(
-                    `UPDATE employee SET role_id = ?, manager_id = ? WHERE ? + ?;`
-                , /* [roleID, managerID, resp.updatedFirstName, resp.updatedLastName] */).then(results => {
+                    `UPDATE employee SET role_id = ?, manager_id = ? WHERE employee.id = ?;`
+                , [roleID, managerID, employeeID]).then(results => {
                     console.log(results);
                     mainList(menuItem, addEmployee, addRole, addDepartment, updateEmployee);
                 }).catch(err => console.log(err));

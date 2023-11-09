@@ -21,7 +21,7 @@ SELECT department.id, department_name FROM department;
 
 UPDATE employee
 SET role_id = ?, manager_id = ?
-WHERE ? + ?;
+WHERE employee.id = ?;
 
 -- Add an employee
 
