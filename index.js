@@ -26,7 +26,6 @@ function managerConfig(mA) {
         for (let mc = 0; mc < results[0].length; mc++) {
             mA.push(results[0][mc].first_name + " " + results[0][mc].last_name);
         }
-        // console.log(mA);
     }).catch(err => console.log(err));
 }
 
@@ -35,7 +34,6 @@ function roleConfig(rA) {
         for (let rc = 0; rc < results[0].length; rc++) {
             rA.push(results[0][rc].title);
         }
-        // console.log(rA);
         return rA;
     }).catch(err => console.log(err));
 }
@@ -45,7 +43,6 @@ function departmentConfig(dA) {
         for (let dc = 0; dc < results[0].length; dc++) {
             dA.push(results[0][dc].department_name);
         }
-        // console.log(dA);
         return dA;
     }).catch(err => console.log(err));
 }
@@ -56,7 +53,6 @@ function employeeConfig(eA) {
         for (let ec = 0; ec < results[0].length; ec++) {
             eA.push(results[0][ec].first_name + " " + results[0][ec].last_name);
         }
-        // console.log(eA);
         return eA;
     }).catch(err => console.log(err));
 }
@@ -67,12 +63,6 @@ function employeeConfirmation(eI, idValue) {
         for (let eConf in results[0]) {
             if (results[0][eConf].first_name + " " + results[0][eConf].last_name == eI) {
                 idValue = results[0][eConf].id;
-                // console.log("-----=========-----");
-                // console.log(idValue);
-                // console.log(eI);
-                // console.log(results[0][conf].id);
-                // console.log(results[0][conf].first_name + " " + results[0][conf].last_name);
-                // console.log("-----=========-----");
             }
         }
         return idValue;
@@ -85,12 +75,6 @@ function departmentConfirmation(dI, idValue) {
         for (let dConf in results[0]) {
             if (results[0][dConf].department_name == dI) {
                 idValue = results[0][dConf].id;
-                // console.log("-----=========-----");
-                // console.log(dI);
-                // console.log(results[0][conf].department_name);
-                // console.log(idValue);
-                // console.log(results[0][conf].id);
-                // console.log("-----=========-----");
             }
         }
         return idValue;
@@ -103,11 +87,6 @@ function roleConfirmation(rI, idValue) {
         for (let rConf in results[0]) {
             if (results[0][rConf].title == rI) {
                 idValue = results[0][rConf].id;
-                // console.log("-----=========-----");
-                // console.log(rI);
-                // console.log(results[0][conf].id);
-                // console.log(idValue);
-                // console.log('-----=========-----');
             }
         }
         return idValue;
@@ -120,12 +99,6 @@ function managerConfirmation(mI, idValue) {
         for (let mConf in results[0]) {
             if (results[0][mConf].first_name + " " + results[0][mConf].last_name == mI) {
                 idValue = results[0][mConf].id;
-                // console.log("-----=========-----");
-                // console.log(idValue);
-                // console.log(mI);
-                // console.log(results[0][conf].id);
-                // console.log(results[0][conf].first_name + " __ " + results[0][conf].last_name);
-                // console.log("-----=========-----");
             }
         }
         if (mI == "None") {
@@ -139,7 +112,29 @@ function respondWithTable(results) {
         const transformed = results.reduce((acc, {id, ...x}) => { acc[id] = x; return acc}, {});
         console.table(transformed);
 }
-//console.log(roleArray);
+
+function EmployeeRegestration(firstName, lastName, roleID, managerID) {
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.roleID = roleID;
+    this.managerID = managerID;
+}
+
+function RoleRegestration(roleName, departmentID, salary) {
+    this.roleName = roleName;
+    this.departmentID = departmentID;
+    this.salary = salary;
+}
+
+function DepartmentRegestration(departmentName) {
+    this.departmentName = departmentName;
+}
+
+function UpdateRegestration(roleID, managerID, employeeID) {
+    this.roleID = roleID;
+    this.managerID = managerID;
+    this.employeeID = employeeID;
+}
 
 const menuItem = [
     {
@@ -233,26 +228,8 @@ const updateEmployee = [
 ]
 
 //
-// I had to add this from function.js because the export didn't work for some reason.
+// I had to add this from function.js a because the export didn't work for some reason.
 //
-
-// function getEmployeeConfirm(r, m) {
-//     if(r != undefined && m != undefined) {
-//         return true;
-//     } else {
-//         return false;
-//     }
-// }
-
-// function roleConfig() {
-//     db.promise().query(`SELECT id, title FROM role;`).then(results => {
-//         let roleArr = [];
-//         for(let i = 0; i < results[0].length; i++) {
-//             roleArr.push(results[0][i].title);
-//         }
-//         // console.log(roleArr);
-//         return roleArr;
-//     });
 
 function mainList(mL, ae, ar, ad, ue) {
 
@@ -300,15 +277,13 @@ function mainList(mL, ae, ar, ad, ue) {
                 roleID = await roleConfirmation(resp.chosenRole, roleID);
                 managerID = await managerConfirmation(resp.chosenManager, managerID);
                 
-                
-                // console.log([resp.newFirstName, resp.newLastName, roleID, managerID]);
                 await db.promise().query(
-                        `UPDATE employee
-                        SET role_id = ?, manager_id = ?
-                        WHERE ? + ?;`
+                        `INSERT INTO employee (first_name, last_name, role_id, manager_id)
+                        VALUE (?, ?, ?, ?);`
                     , [resp.newFirstName, resp.newLastName, roleID, managerID]).then(results => {
                         // console.log([resp.newFirstName, resp.newLastName, roleID, managerID]);
-                        console.log(results);
+                        const newEmployee = new EmployeeRegestration(resp.newFirstName,  resp.newLastName, roleID, managerID);
+                        console.table(newEmployee);
                         mainList(menuItem, addEmployee, addRole, addDepartment, updateEmployee);
                     }).catch(err => console.log(err));
             }).catch(erro => console.log(erro));
@@ -321,12 +296,12 @@ function mainList(mL, ae, ar, ad, ue) {
                 let departmentID;
                 departmentID = await departmentConfirmation(resp.chosenDepartment);
 
-                // console.log([resp.newTitle, departmentID, resp.newSalary]);
                 await db.promise().query(
                     `INSERT INTO role (title, department_id, salary)
                     VALUE (?, ?, ?);`
                 , [resp.newTitle, departmentID, resp.newSalary]).then(results => {
-                    console.log(results);
+                    const newRole = new RoleRegestration(resp.newTitle, departmentID, resp.newSalary);
+                    console.table(newRole);
                     mainList(menuItem, addEmployee, addRole, addDepartment, updateEmployee);
                 }).catch(err => console.log(err));
             }).catch(erro => console.log(erro));
@@ -337,7 +312,8 @@ function mainList(mL, ae, ar, ad, ue) {
                     `INSERT INTO department (department_name)
                     VALUE (?);`
                 , resp.newDepartment).then(results => {
-                    console.log(results);
+                    const newDepartment = new DepartmentRegestration(resp.newDepartment);
+                    console.log(newDepartment);
                     mainList(menuItem, addEmployee, addRole, addDepartment, updateEmployee);
                 }).catch(err => console.log(err));
             }).catch(erro => console.log(erro));
@@ -362,7 +338,8 @@ function mainList(mL, ae, ar, ad, ue) {
                 await db.promise().query(
                     `UPDATE employee SET role_id = ?, manager_id = ? WHERE employee.id = ?;`
                 , [roleID, managerID, employeeID]).then(results => {
-                    console.log(results);
+                    const updatedEmployee = new UpdateRegestration(roleID, managerID, employeeID);
+                    console.log(updatedEmployee);
                     mainList(menuItem, addEmployee, addRole, addDepartment, updateEmployee);
                 }).catch(err => console.log(err));
             }).catch(erro => console.log(erro));

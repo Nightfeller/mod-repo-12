@@ -34,8 +34,8 @@ CREATE TABLE employee (
 
 SELECT DATABASE();
 
--- source C:\Users\Peter Earls\bootcamp\challenge-twelve\mod-repo-12\sequal\schema.sql
+-- .\sequal\schema.sql
 
--- source C:\Users\Peter Earls\bootcamp\challenge-twelve\mod-repo-12\sequal\seeds.sql
+-- .\sequal\seeds.sql
 
--- source C:\Users\Peter Earls\bootcamp\challenge-twelve\mod-repo-12\sequal\query.sql
+-- .\sequal\query.sql
